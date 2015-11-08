@@ -133,6 +133,7 @@ public class MainActivity extends Activity {
 //        } else if (text == "B") {
 //            id = "29";
 //        }
+
         postRequest(id, String.valueOf(r.nextInt(1000000) + 1));
     }
 
