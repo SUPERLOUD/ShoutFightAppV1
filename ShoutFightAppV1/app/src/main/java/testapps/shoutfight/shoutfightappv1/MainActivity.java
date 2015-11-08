@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -25,8 +26,12 @@ import com.android.volley.toolbox.Volley;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 public class MainActivity extends Activity { //+ 1 when 28000
+
+    String id;
+    final Random r = new Random();
 
     RequestQueue queue;
     // Tag used to log messages
@@ -65,7 +70,6 @@ public class MainActivity extends Activity { //+ 1 when 28000
         record.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                // TODO Auto-generated method stub
 
                 if (isChecked) {
                     bufferSize = AudioRecord.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT) * bufferSizeFactor;
@@ -99,6 +103,36 @@ public class MainActivity extends Activity { //+ 1 when 28000
     }
 
     public void onClick(View view) {
+        Button b = (Button) view;
+        String text = b.getText().toString();
+
+        if (text.equals("Up")) {
+            id = "1";
+        } else if (text.equals("Left")) {
+            id = "2";
+        } else if (text.equals("Down")) {
+            id = "3";
+        } else if (text.equals("Right")) {
+            id = "4";
+        } else if (text.equals("A")) {
+            id = "5";
+        } else if (text.equals("B")) {
+            id = "6";
+        }
+
+//        if (text == "Up") {
+//            id = "8";
+//        } else if (text == "Left") {
+//            id = "9";
+//        } else if (text == "Down") {
+//            id = "10";
+//        } else if (text == "Right") {
+//            id = "11";
+//        } else if (text == "A") {
+//            id = "12";
+//        } else if (text == "B") {
+//            id = "13";
+//        }
         StringRequest sr = new StringRequest(Request.Method.POST,"https://api.syncano.io/v1/instances/dark-snowflake-7198/webhooks/action/run/",
                 new Response.Listener<String>() {
                     @Override
@@ -118,8 +152,8 @@ public class MainActivity extends Activity { //+ 1 when 28000
             @Override
             protected Map<String,String> getParams(){
                 Map<String,String> params = new HashMap<>();
-                params.put("id","1");
-                params.put("dummy","1000");
+                params.put("id",id);
+                params.put("dummy",String.valueOf(r.nextInt(1000000) + 1));
 
                 return params;
             }
