@@ -5,10 +5,10 @@ Bare minimum app to see if concept actually works. Check older versions for the 
 Here are the specs for IDs and controls
 
 
-- 1 8 up
-- 2 9 left
-- 3 10 down
-- 4 11 right
-- 5 12 a
-- 6 13 b
-- 7 14 level
+- 17 24 up
+- 18 25 left
+- 19 26 down
+- 20 27 right
+- 21 28 a
+- 22 29 b
+- 23 30 level
