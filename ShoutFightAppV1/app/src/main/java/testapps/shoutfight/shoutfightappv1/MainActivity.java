@@ -1,13 +1,19 @@
 package testapps.shoutfight.shoutfightappv1;
 
 import android.app.Activity;
+import android.media.AudioFormat;
+import android.media.AudioRecord;
+import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
+import android.widget.CompoundButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -20,61 +26,95 @@ import com.android.volley.toolbox.Volley;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity { //+ 1 when 28000
 
     RequestQueue queue;
     // Tag used to log messages
     private static final String TAG = MainActivity.class.getSimpleName();
 
+    private static final int sampleRate = 11025;
+    private static final int bufferSizeFactor = 10;
+
+    private AudioRecord audio;
+    private int bufferSize;
+
+    private ProgressBar level;
+
+    private TextView textView, textView2;
+
+    private Handler handler = new Handler();
+
+    private int lastLevel = 0;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         queue = Volley.newRequestQueue(this);
 
-        TextView textView = (TextView) findViewById(R.id.ayy);
-        textView.setText("ayy");
-    }
+        level = (ProgressBar) findViewById(R.id.progressbar_level);
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
+        textView = (TextView) findViewById(R.id.textView);
+        textView2 = (TextView) findViewById(R.id.textView2);
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+//        level.setMax(32676);
+        level.setMax(70000);
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
+        ToggleButton record = (ToggleButton) findViewById(R.id.toggleButton);
 
-        return super.onOptionsItemSelected(item);
+        record.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                // TODO Auto-generated method stub
+
+                if (isChecked) {
+                    bufferSize = AudioRecord.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT) * bufferSizeFactor;
+
+                    audio = new AudioRecord(MediaRecorder.AudioSource.MIC, sampleRate, AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT, bufferSize);
+
+                    audio.startRecording();
+
+                    Thread thread = new Thread(new Runnable() {
+                        public void run() {
+                            readAudioBuffer();
+                        }
+                    });
+
+                    thread.setPriority(Thread.currentThread().getThreadGroup().getMaxPriority());
+
+                    thread.start();
+
+                    handler.removeCallbacks(update);
+                    handler.postDelayed(update, 25);
+
+                } else if (audio != null) {
+                    audio.stop();
+                    audio.release();
+                    audio = null;
+                    handler.removeCallbacks(update);
+                }
+
+            }
+        });
     }
 
     public void onClick(View view) {
         StringRequest sr = new StringRequest(Request.Method.POST,"https://api.syncano.io/v1/instances/dark-snowflake-7198/webhooks/action/run/",
-            new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-                    Toast.makeText(
-                            getApplicationContext(),
-                            response,
-                            Toast.LENGTH_SHORT)
-                            .show();
-                }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.d(TAG, error.toString(), error);
-                }
-            }){
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Toast.makeText(
+                                getApplicationContext(),
+                                response,
+                                Toast.LENGTH_SHORT)
+                                .show();
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d(TAG, error.toString(), error);
+            }
+        }){
             @Override
             protected Map<String,String> getParams(){
                 Map<String,String> params = new HashMap<>();
@@ -90,7 +130,59 @@ public class MainActivity extends Activity {
                 params.put("X-API-KEY","7376106916d5ae8ab578040ae303e860f76c0b50");
                 return params;
             }
-            };
-    queue.add(sr);
+        };
+        queue.add(sr);
     }
+
+    private void readAudioBuffer() {
+
+        try {
+            short[] buffer = new short[bufferSize];
+
+            int bufferReadResult;
+
+            do {
+
+                bufferReadResult = audio.read(buffer, 0, bufferSize);
+
+                for (int i = 0; i < bufferReadResult; i++){
+
+                    if (buffer[i] > lastLevel) {
+                        lastLevel = buffer[i];
+                    }
+
+                }
+
+            } while (bufferReadResult > 0 && audio.getRecordingState() == AudioRecord.RECORDSTATE_RECORDING);
+
+            if (audio != null) {
+                audio.release();
+                audio = null;
+                handler.removeCallbacks(update);
+
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private Runnable update = new Runnable() {
+
+        public void run() {
+
+            MainActivity.this.level.setProgress(lastLevel);
+            textView.setText(String.valueOf(lastLevel));
+            if (lastLevel > 28000) { //28000
+                String pls = String.valueOf(Integer.parseInt(textView2.getText().toString()) + 1);
+                textView2.setText(pls);
+            }
+            lastLevel *= .5;
+
+            handler.postAtTime(this, SystemClock.uptimeMillis() + 500);
+
+        }
+
+    };
 }
