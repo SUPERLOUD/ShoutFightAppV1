@@ -133,6 +133,10 @@ public class MainActivity extends Activity { //+ 1 when 28000
 //        } else if (text == "B") {
 //            id = "13";
 //        }
+        postRequest(id, String.valueOf(r.nextInt(1000000) + 1));
+    }
+
+    public void postRequest(final String id, final String value) {
         StringRequest sr = new StringRequest(Request.Method.POST,"https://api.syncano.io/v1/instances/dark-snowflake-7198/webhooks/action/run/",
                 new Response.Listener<String>() {
                     @Override
@@ -153,7 +157,7 @@ public class MainActivity extends Activity { //+ 1 when 28000
             protected Map<String,String> getParams(){
                 Map<String,String> params = new HashMap<>();
                 params.put("id",id);
-                params.put("dummy",String.valueOf(r.nextInt(1000000) + 1));
+                params.put("dummy",value);
 
                 return params;
             }
@@ -211,6 +215,8 @@ public class MainActivity extends Activity { //+ 1 when 28000
             if (lastLevel > 28000) { //28000
                 String pls = String.valueOf(Integer.parseInt(textView2.getText().toString()) + 1);
                 textView2.setText(pls);
+                postRequest("7", pls);
+//                postRequest("14", pls);
             }
             lastLevel *= .5;
 
