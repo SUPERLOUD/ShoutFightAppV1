@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-public class MainActivity extends Activity { //+ 1 when 28000
+public class MainActivity extends Activity {
 
     String id;
     final Random r = new Random();
@@ -107,31 +107,31 @@ public class MainActivity extends Activity { //+ 1 when 28000
         String text = b.getText().toString();
 
         if (text.equals("Up")) {
-            id = "1";
+            id = "17";
         } else if (text.equals("Left")) {
-            id = "2";
+            id = "18";
         } else if (text.equals("Down")) {
-            id = "3";
+            id = "19";
         } else if (text.equals("Right")) {
-            id = "4";
+            id = "20";
         } else if (text.equals("A")) {
-            id = "5";
+            id = "21";
         } else if (text.equals("B")) {
-            id = "6";
+            id = "22";
         }
 
 //        if (text == "Up") {
-//            id = "8";
+//            id = "24";
 //        } else if (text == "Left") {
-//            id = "9";
+//            id = "25";
 //        } else if (text == "Down") {
-//            id = "10";
+//            id = "26";
 //        } else if (text == "Right") {
-//            id = "11";
+//            id = "27";
 //        } else if (text == "A") {
-//            id = "12";
+//            id = "28";
 //        } else if (text == "B") {
-//            id = "13";
+//            id = "29";
 //        }
         postRequest(id, String.valueOf(r.nextInt(1000000) + 1));
     }
@@ -213,10 +213,14 @@ public class MainActivity extends Activity { //+ 1 when 28000
             MainActivity.this.level.setProgress(lastLevel);
             textView.setText(String.valueOf(lastLevel));
             if (lastLevel > 28000) { //28000
-                String pls = String.valueOf(Integer.parseInt(textView2.getText().toString()) + 1);
-                textView2.setText(pls);
-                postRequest("7", pls);
-//                postRequest("14", pls);
+                int pls = Integer.parseInt(textView2.getText().toString()) + 1;
+                String plString = String.valueOf(pls);
+
+                if (pls % 5 == 0 && !plString.equals(textView2.getText().toString())) {
+                    postRequest("23", plString);
+//                postRequest("30", pls);
+                }
+                textView2.setText(plString);
             }
             lastLevel *= .5;
 
