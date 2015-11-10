@@ -106,33 +106,33 @@ public class MainActivity extends Activity {
         Button b = (Button) view;
         String text = b.getText().toString();
 
-        if (text.equals("Up")) {
-            id = "17";
-        } else if (text.equals("Left")) {
-            id = "18";
-        } else if (text.equals("Down")) {
-            id = "19";
-        } else if (text.equals("Right")) {
-            id = "20";
-        } else if (text.equals("A")) {
-            id = "21";
-        } else if (text.equals("B")) {
-            id = "22";
-        }
-
-//        if (text == "Up") {
-//            id = "24";
-//        } else if (text == "Left") {
-//            id = "25";
-//        } else if (text == "Down") {
-//            id = "26";
-//        } else if (text == "Right") {
-//            id = "27";
-//        } else if (text == "A") {
-//            id = "28";
-//        } else if (text == "B") {
-//            id = "29";
+//        if (text.equals("Up")) {
+//            id = "17";
+//        } else if (text.equals("Left")) {
+//            id = "18";
+//        } else if (text.equals("Down")) {
+//            id = "19";
+//        } else if (text.equals("Right")) {
+//            id = "20";
+//        } else if (text.equals("A")) {
+//            id = "21";
+//        } else if (text.equals("B")) {
+//            id = "22";
 //        }
+
+        if (text.equals("Up")) {
+            id = "24";
+        } else if (text.equals("Left")) {
+            id = "25";
+        } else if (text.equals("Down")) {
+            id = "26";
+        } else if (text.equals("Right")) {
+            id = "27";
+        } else if (text.equals("A")) {
+            id = "28";
+        } else if (text.equals("B")) {
+            id = "29";
+        }
 
         postRequest(id, String.valueOf(r.nextInt(1000000) + 1));
     }
@@ -218,8 +218,8 @@ public class MainActivity extends Activity {
                 String plString = String.valueOf(pls);
 
                 if (pls % 5 == 0 && !plString.equals(textView2.getText().toString())) {
-                    postRequest("23", plString);
-//                postRequest("30", pls);
+//                    postRequest("23", plString);
+                   postRequest("30", plString);
                 }
                 textView2.setText(plString);
             }
